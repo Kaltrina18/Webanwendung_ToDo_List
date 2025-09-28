@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"/><title>Verifizieren & Passwort</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="style.css"/></head>
+<body>
+  <div class="card-centered">
+    <div class="logo">CODIRE</div>
+    <h1>Code verifizieren & Passwort setzen</h1>
+    <p id="showIdentifier" style="color:#333"></p>
+    <input id="code" class="input" placeholder="6-stelliger Code"/>
+    <input id="password" class="input" type="password" placeholder="Neues Passwort (min.12, 1 Sonderzeichen)"/>
+    <button id="btnSet" class="btn" type="button">Verifizieren & Speichern</button>
+    <button id="btnBack" class="small-link" type="button">Zurück</button>
+  </div>
+
+<script>
+function qs(){ return Object.fromEntries(new URLSearchParams(location.search)); }
+const params = qs();
+document.getElementById('showIdentifier').textContent = params.identifier ? ('Verifiziere: ' + params.identifier) : '';
+document.getElementById('btnBack').addEventListener('click', ()=> {
+  if (params.purpose === 'register') location.href = '/register.html';
+  else location.href = '/forgot.html';
+});
+
+async function api(path, opts={}) {
+  opts.headers = opts.headers || {};
+  if (opts.body && typeof opts.body === 'object') { opts.body = JSON.stringify(opts.body); opts.headers['Content-Type'] = 'application/json'; }
+  const res = await fetch(path, { ...opts, credentials: 'include' });
+  if (!res.ok) {
+    const e = await res.json();
+    alert(e.error || 'Fehler');
+    throw 'err';
+  }
+  return res.json();
+}
+
+document.getElementById('btnSet').addEventListener('click', async () => {
+  const identifier = params.identifier;
+  const code = document.getElementById('code').value.trim();
+  const password = document.getElementById('password').value;
+  if (!identifier || !code || !password) { alert('Bitte Identifier, Code und Passwort eingeben'); return; }
+  try {
+    await api('/api/verify-and-set', { method: 'POST', body: { identifier, code, password, purpose: params.purpose || 'register' }});
+    alert('Verifiziert & Passwort gesetzt — Du wirst eingeloggt.');
+    location.href = '/app.html';
+  } catch (e) {}
+});
+</script>
+</body>
+</html>
