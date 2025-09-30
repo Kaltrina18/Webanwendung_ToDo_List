@@ -8,11 +8,11 @@
 </head>
 <body>
 
-<!-- Hamburger Menü -->
+<!--Hamburger Menü-->
 <button id="menuBtn" class="hamburger">☰</button>
 
 <div id="sideMenu" class="side-menu">
-  <button id="showTodos">Meine Aufgaben</button>
+  <button class="top-placeholder" id="showTodos">Meine Aufgaben</button>
   <button id="showCompleted">Erledigte Aufgaben</button>
   <button id="btnLogout" class="small-link">Logout</button>
 </div>
@@ -94,7 +94,6 @@ async function loadTodos(){
   try{
     let todos = await api('/api/todos');
     
-    // Standardaufgaben für den Tag hinzufügen, falls leer
     const today = new Date().toISOString().split('T')[0];
     if(!todos.some(t=>t.createdDate===today)) {
       for(const task of STANDARD_TASKS){
@@ -109,16 +108,40 @@ async function loadTodos(){
     todos.forEach(t=>{
       if(t.done) return;
       const li=document.createElement('li');
+
       const checkbox = document.createElement('input');
       checkbox.type='checkbox';
       checkbox.addEventListener('change', async()=>{
         await api(`/api/todos/${t.id}/toggle`,{method:'POST'});
         loadTodos();
       });
+
       const span = document.createElement('span');
       span.textContent = t.text;
+
+      // Bearbeiten Button
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Bearbeiten';
+      editBtn.addEventListener('click', async () => {
+        const newText = prompt('Neuer Text:', t.text);
+        if(!newText) return;
+        await api(`/api/todos/${t.id}`, { method: 'PATCH', body: { text: newText } });
+        loadTodos();
+      });
+
+      // Löschen Button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Löschen';
+      deleteBtn.addEventListener('click', async () => {
+        if(!confirm('Willst du die Aufgabe wirklich löschen?')) return;
+        await api(`/api/todos/${t.id}`, { method: 'DELETE' });
+        loadTodos();
+      });
+
       li.appendChild(checkbox);
       li.appendChild(span);
+      li.appendChild(editBtn);
+      li.appendChild(deleteBtn);
       list.appendChild(li);
     });
   }catch(e){ location.href='/'; }

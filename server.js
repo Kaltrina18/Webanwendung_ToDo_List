@@ -188,6 +188,7 @@ app.post('/api/logout', requireAuth, (req,res)=>{
   });
 });
 
+// ToDo CRUD
 app.get('/api/todos', requireAuth, (req,res)=>{
   db.all('SELECT id,text,done,createdDate,doneDate FROM todos WHERE owner_id=?', [req.session.userId], (err,rows)=>{
     if(err) return res.status(500).json({ error: err.message });
@@ -221,6 +222,25 @@ app.post('/api/todos/:id/toggle', requireAuth, (req,res)=>{
   });
 });
 
+// Aufgabe bearbeiten
+app.patch('/api/todos/:id', requireAuth, (req,res)=>{
+  const { text } = req.body;
+  const id = req.params.id;
+  if(!text) return res.status(400).json({ error:'Text fehlt' });
+
+  db.get('SELECT owner_id FROM todos WHERE id=?', [id], (err,row)=>{
+    if(err) return res.status(500).json({ error: err.message });
+    if(!row) return res.status(404).json({ error:'Nicht gefunden' });
+    if(row.owner_id!==req.session.userId) return res.status(403).json({ error:'Nicht berechtigt' });
+
+    db.run('UPDATE todos SET text=? WHERE id=?', [text,id], e=>{
+      if(e) return res.status(500).json({ error:e.message });
+      res.json({ status:'ok', text });
+    });
+  });
+});
+
+// Aufgabe löschen
 app.delete('/api/todos/:id', requireAuth, (req,res)=>{
   const id=req.params.id;
   db.get('SELECT owner_id FROM todos WHERE id=?',[id],(err,row)=>{

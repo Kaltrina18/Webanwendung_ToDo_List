@@ -45,6 +45,15 @@ h1{margin:6px 0 18px 0;font-size:20px;color:#09320d}
   margin-bottom:8px;
 }
 .todo-list li span{flex:1}
+.todo-list li button{
+  padding:4px 8px;
+  font-size:12px;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+}
+.todo-list li button:nth-child(3){background:#ffeb3b;margin-left:5px} /* Bearbeiten */
+.todo-list li button:nth-child(4){background:#f44336;color:#fff;margin-left:5px} /* Löschen */
 
 /* Hamburger Side Menu */
 .hamburger{
@@ -54,7 +63,7 @@ h1{margin:6px 0 18px 0;font-size:20px;color:#09320d}
 }
 .side-menu{
   position:fixed;
-  top:60px; /* unterhalb Hamburger */
+  top:0px; /* unterhalb Hamburger */
   left:-220px;
   width:220px;
   height:calc(100% - 60px);
@@ -84,4 +93,8 @@ h1{margin:6px 0 18px 0;font-size:20px;color:#09320d}
   list-style:none;
   padding:6px 12px;
   border-bottom:1px solid #cce5cc;
+}
+
+.top-placeholder {
+  margin-top: 60px;
 }
