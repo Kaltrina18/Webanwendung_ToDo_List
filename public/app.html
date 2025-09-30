@@ -1,33 +1,33 @@
 <!doctype html>
-<html lang="de">
+<html lang = "de">
 <head>
-<meta charset="utf-8"/>
+<meta charset = "utf-8"/>
 <title>Codire — Aufgaben</title>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<link rel="stylesheet" href="style.css"/>
+<meta name = "viewport" content = "width=device-width,initial-scale=1"/>
+<link rel = "stylesheet" href = "style.css"/>
 </head>
 <body>
 
 <!--Hamburger Menü-->
-<button id="menuBtn" class="hamburger">☰</button>
+<button id = "menuBtn" class = "hamburger">☰</button>
 
-<div id="sideMenu" class="side-menu">
-  <button class="top-placeholder" id="showTodos">Meine Aufgaben</button>
-  <button id="showCompleted">Erledigte Aufgaben</button>
-  <button id="btnLogout" class="small-link">Logout</button>
+<div id = "sideMenu" class = "side-menu">
+  <button class = "top-placeholder" id = "showTodos">Meine Aufgaben</button>
+  <button id = "showCompleted">Erledigte Aufgaben</button>
+  <button id = "btnLogout" class = "small-link">Logout</button>
 </div>
 
-<div class="card-centered">
-  <div class="logo">CODIRE</div>
-  <h1 id="cardTitle">Meine Aufgaben</h1>
+<div class = "card-centered">
+  <div class = "logo">CODIRE</div>
+  <h1 id = "cardTitle">Meine Aufgaben</h1>
 
-  <div id="inputContainer">
-    <input id="newTodo" class="input" placeholder="Neue Aufgabe hinzufügen"/>
-    <button id="addBtn" class="btn">Hinzufügen</button>
+  <div id = "inputContainer">
+    <input id = "newTodo" class = "input" placeholder = "Neue Aufgabe hinzufügen"/>
+    <button id = "addBtn" class = "btn">Hinzufügen</button>
   </div>
 
-  <ul id="todoList" class="todo-list"></ul>
-  <div id="completedList" class="completed-list"></div>
+  <ul id = "todoList" class = "todo-list"></ul>
+  <div id = "completedList" class = "completed-list"></div>
 </div>
 
 <script>
@@ -39,22 +39,31 @@ const STANDARD_TASKS = [
 
 async function api(path, opts={}) {
   opts.headers = opts.headers || {};
-  if(opts.body && typeof opts.body==='object'){
+  if(opts.body && typeof opts.body === 'object'){
     opts.body = JSON.stringify(opts.body);
     opts.headers['Content-Type'] = 'application/json';
   }
-  const res = await fetch(path, {...opts, credentials:'include'});
+  const res = await fetch(path, 
+  {...opts, credentials:'include'});
+
   if(!res.ok){
-    try{const e=await res.json(); alert(e.error||'Fehler');}catch(_){alert('Fehler');}
+    try{
+      const e = await res.json(); 
+      alert(e.error||'Fehler');
+    } catch(_) {
+      alert('Fehler');
+    }
     throw 'err';
   }
   return res.json();
 }
 
 // Logout
-document.getElementById('btnLogout').addEventListener('click', async()=> {
-  await api('/api/logout',{method:'POST'});
-  location.href='/';
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  await api('/api/logout',{
+    method:'POST'
+  });
+  location.href = '/';
 });
 
 // Side Menu Logik
@@ -62,57 +71,67 @@ const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
 let showDone = false;
 
-menuBtn.addEventListener('click', ()=> sideMenu.classList.toggle('open'));
-document.getElementById('showTodos').addEventListener('click', ()=>{
-  showDone=false;
-  document.getElementById('cardTitle').textContent="Meine Aufgaben";
-  document.getElementById('inputContainer').style.display='flex';
-  document.getElementById('todoList').style.display='block';
-  document.getElementById('completedList').style.display='none';
+menuBtn.addEventListener('click', () => sideMenu.classList.toggle('open'));
+document.getElementById('showTodos').addEventListener('click', () => {
+  showDone = false;
+  document.getElementById('cardTitle').textContent = "Meine Aufgaben";
+  document.getElementById('inputContainer').style.display = 'flex';
+  document.getElementById('todoList').style.display = 'block';
+  document.getElementById('completedList').style.display = 'none';
   loadTodos();
 });
-document.getElementById('showCompleted').addEventListener('click', ()=>{
-  showDone=true;
-  document.getElementById('cardTitle').textContent="Erledigte Aufgaben";
-  document.getElementById('inputContainer').style.display='none';
-  document.getElementById('todoList').style.display='none';
-  document.getElementById('completedList').style.display='block';
+document.getElementById('showCompleted').addEventListener('click', () => {
+  showDone = true;
+  document.getElementById('cardTitle').textContent = "Erledigte Aufgaben";
+  document.getElementById('inputContainer').style.display = 'none';
+  document.getElementById('todoList').style.display = 'none';
+  document.getElementById('completedList').style.display = 'block';
   loadCompleted();
 });
 
 // Neue Aufgabe hinzufügen
-document.getElementById('addBtn').addEventListener('click', async()=> {
+document.getElementById('addBtn').addEventListener('click', async () => {
   const txt = document.getElementById('newTodo').value.trim();
-  if(!txt) return;
-  await api('/api/todos',{method:'POST',body:{text:txt}});
-  document.getElementById('newTodo').value='';
+  if(!txt) 
+    return;
+  await api('/api/todos',{
+    method:'POST',
+    body:{text:txt}
+  });
+  document.getElementById('newTodo').value = '';
   loadTodos();
 });
 
 // Offene Aufgaben laden
-async function loadTodos(){
-  try{
+async function loadTodos() {
+  try {
     let todos = await api('/api/todos');
     
     const today = new Date().toISOString().split('T')[0];
-    if(!todos.some(t=>t.createdDate===today)) {
+    if(!todos.some(t => t.createdDate === today)) {
       for(const task of STANDARD_TASKS){
-        await api('/api/todos',{method:'POST',body:{text:task}});
+        await api('/api/todos',{
+          method:'POST',
+          body:{text:task}
+        });
       }
       todos = await api('/api/todos');
     }
 
     const list = document.getElementById('todoList');
-    list.innerHTML='';
+    list.innerHTML = '';
 
-    todos.forEach(t=>{
-      if(t.done) return;
-      const li=document.createElement('li');
+    todos.forEach(t => {
+      if(t.done) 
+        return;
+      const li = document.createElement('li');
 
       const checkbox = document.createElement('input');
-      checkbox.type='checkbox';
-      checkbox.addEventListener('change', async()=>{
-        await api(`/api/todos/${t.id}/toggle`,{method:'POST'});
+      checkbox.type = 'checkbox';
+      checkbox.addEventListener('change', async () => {
+        await api(`/api/todos/${t.id}/toggle`,{
+          method:'POST'
+        });
         loadTodos();
       });
 
@@ -124,8 +143,12 @@ async function loadTodos(){
       editBtn.textContent = 'Bearbeiten';
       editBtn.addEventListener('click', async () => {
         const newText = prompt('Neuer Text:', t.text);
-        if(!newText) return;
-        await api(`/api/todos/${t.id}`, { method: 'PATCH', body: { text: newText } });
+        if(!newText) 
+          return;
+        await api(`/api/todos/${t.id}`, { 
+          method: 'PATCH',
+          body: { text: newText } 
+        });
         loadTodos();
       });
 
@@ -133,8 +156,11 @@ async function loadTodos(){
       const deleteBtn = document.createElement('button');
       deleteBtn.textContent = 'Löschen';
       deleteBtn.addEventListener('click', async () => {
-        if(!confirm('Willst du die Aufgabe wirklich löschen?')) return;
-        await api(`/api/todos/${t.id}`, { method: 'DELETE' });
+        if(!confirm('Willst du die Aufgabe wirklich löschen?')) 
+          return;
+        await api(`/api/todos/${t.id}`, { 
+          method: 'DELETE' 
+        });
         loadTodos();
       });
 
@@ -144,7 +170,9 @@ async function loadTodos(){
       li.appendChild(deleteBtn);
       list.appendChild(li);
     });
-  }catch(e){ location.href='/'; }
+  } catch(e) { 
+    location.href = '/'; 
+  }
 }
 
 // Erledigte Aufgaben nach Datum gruppieren
@@ -152,12 +180,12 @@ async function loadCompleted(){
   try{
     const todos = await api('/api/todos');
     const completedList = document.getElementById('completedList');
-    completedList.innerHTML='';
+    completedList.innerHTML = '';
 
     const grouped = {};
-    todos.filter(t=>t.done).forEach(t=>{
+    todos.filter(t => t.done).forEach(t => {
       const date = t.doneDate?.split('T')[0] || new Date().toISOString().split('T')[0];
-      if(!grouped[date]) grouped[date]=[];
+      if(!grouped[date]) grouped[date] = [];
       grouped[date].push(t);
     });
 
@@ -167,7 +195,7 @@ async function loadCompleted(){
       summaryTitle.textContent = date;
       summary.appendChild(summaryTitle);
 
-      grouped[date].forEach(t=>{
+      grouped[date].forEach(t => {
         const li = document.createElement('li');
         li.textContent = t.text;
         summary.appendChild(li);
@@ -175,7 +203,7 @@ async function loadCompleted(){
 
       completedList.appendChild(summary);
     }
-  }catch(e){ location.href='/'; }
+  } catch(e){ location.href = '/'; }
 }
 
 // Initial

@@ -1,29 +1,31 @@
 <!doctype html>
-<html lang="de">
+<html lang = "de">
 <head>
   <meta charset="utf-8"/>
   <title>ToDo Liste — Login</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name = "viewport" content = "width=device-width,initial-scale=1"/>
+  <link rel = "stylesheet" href = "style.css"/>
 </head>
 <body>
-  <div class="card-centered">
-    <div class="logo">CODIRE</div>
+  <div class = "card-centered">
+    <div class = "logo">CODIRE</div>
     <h1>ToDo-Liste</h1>
-    <input id="loginIdentifier" class="input" placeholder="E-Mail oder Telefonnummer" />
-    <input id="loginPassword" class="input" type="password" placeholder="Passwort" />
-    <button id="btnLogin" class="btn" type="button">➜ Anmelden</button>
+    <input id = "loginIdentifier" class = "input" placeholder = "E-Mail oder Telefonnummer" />
+    <input id = "loginPassword" class = "input" type = "password" placeholder = "Passwort" />
+    <button id = "btnLogin" class = "btn" type = "button">➜ Anmelden</button>
 
     <!-- Links untereinander -->
-    <div class="small-row" style="display:flex; flex-direction:column; gap:6px; margin-top:12px;">
-      <button id="forgotBtn" class="small-link">Passwort vergessen?</button>
-      <button id="registerBtn" class="small-link">Registrieren</button>
+    <div class = "small-row" style = "display:flex; flex-direction:column; gap:6px; margin-top:12px;">
+      <button id = "registerBtn" class = "small-link">Registrieren</button>
+      <button id = "forgotBtn" class = "small-link">Passwort vergessen?</button>
     </div>
   </div>
 
 <script>
 /* Navigation + Login */
-function showAlert(msg){ alert(msg); }
+function showAlert(msg){ 
+  alert(msg); 
+}
 
 async function api(path, opts = {}) {
   opts.headers = opts.headers || {};
@@ -35,7 +37,11 @@ async function api(path, opts = {}) {
   const res = await fetch(path, opts);
   if (!res.ok) {
     let err;
-    try { err = await res.json(); } catch(_) { err = { error: res.statusText }; }
+    try { 
+      err = await res.json(); 
+    } catch(_) { 
+      err = { error: res.statusText }; 
+    }
     throw err;
   }
   return res.json();
@@ -55,11 +61,18 @@ document.getElementById('forgotBtn').addEventListener('click', () => {
 document.getElementById('btnLogin').addEventListener('click', async () => {
   const identifier = document.getElementById('loginIdentifier').value.trim();
   const password = document.getElementById('loginPassword').value;
-  if (!identifier || !password) { showAlert('Bitte Identifier + Passwort eingeben'); return; }
+  if (!identifier || !password) { 
+    showAlert('Bitte Identifier + Passwort eingeben'); 
+    return; 
+  }
   console.log("Login geklickt mit Identifier:", identifier);
   try {
-    await api('/api/login', { method: 'POST', body: { identifier, password }});
+    await api('/api/login', {
+       method: 'POST', 
+       body: { identifier, password }
+      });
     location.href = '/app.html';
+    
   } catch (e) {
     console.error("Login Fehler:", e);
     showAlert(e.error || 'Login fehlgeschlagen');

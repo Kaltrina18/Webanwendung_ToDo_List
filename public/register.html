@@ -1,38 +1,83 @@
 <!doctype html>
-<html lang="de">
-<head><meta charset="utf-8"/><title>Registrieren</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="style.css"/></head>
+<html lang = "de">
+<head>
+<meta charset = "utf-8"/>
+<title>Registrieren</title>
+<meta name = "viewport" content = "width=device-width,initial-scale=1"/>
+<!-- Stylesheet für Layout und Design -->
+<link rel = "stylesheet" href = "style.css"/>
+</head>
 <body>
-  <div class="card-centered">
-    <div class="logo">CODIRE</div>
+  <!-- Registrierungsformular in einer zentrierten Karte -->
+  <div class = "card-centered">
+    <!-- Logo -->
+    <div class = "logo">
+      CODIRE
+    </div>
+    <!-- Überschrift -->
     <h1>Registrieren</h1>
-    <input id="identifier" class="input" placeholder="E-Mail oder Telefonnummer"/>
-    <button id="btnRequest" class="btn" type="button">Code anfordern</button>
-    <button id="btnBack" class="small-link" type="button">Zurück zum Login</button>
-    <p style="font-size:13px;color:#555;margin-top:8px">Gib deine E-Mail oder Telefonnummer ein. Du erhältst einen 6-stelligen Code.</p>
+    <!-- Eingabefeld für E-Mail oder Telefonnummer -->
+    <input id = "identifier" class = "input" placeholder = "E-Mail oder Telefonnummer"/>
+    <!-- Button, um Bestätigungscode anzufordern -->
+    <button id = "btnRequest" class ="btn" type = "button">
+      Code anfordern
+    </button>
+    <!-- Button, um zurück zum Login zu gelangen -->
+    <button id = "btnBack" class = "small-link" type = "button">
+      Zurück zum Login
+    </button>
+    <!-- Hinweistext für Benutzer -->
+    <p style = "font-size:13px;color:#555;margin-top:8px">
+      Gib deine E-Mail oder Telefonnummer ein. Du erhältst einen 6-stelligen Code.
+    </p>
   </div>
 
+  <!-- JavaScript: API-Logik und Eventlistener -->
 <script>
-async function api(path, opts={}) {
-  opts.headers=opts.headers||{};
-  if(opts.body && typeof opts.body==='object'){ opts.body=JSON.stringify(opts.body); opts.headers['Content-Type']='application/json'; }
-  const res = await fetch(path, {...opts, credentials:'include'});
+  // Hilfsfunktion für API-Requests an den Server
+async function api(path, opts = {}) {
+  opts.headers = opts.headers||{};
+  if(opts.body && typeof opts.body === 'object'){
+     opts.body = JSON.stringify(opts.body); 
+    opts.headers['Content-Type'] = 'application/json'; 
+  }
+  const res = await fetch(path, {...opts, credentials:'include'}
+  );
+
   if (!res.ok) {
-    try { const e = await res.json(); alert(e.error || 'Fehler'); } catch(_) { alert('Fehler'); }
+    try { 
+      const e = await res.json(); 
+      alert(e.error || 'Fehler'); 
+    } 
+    catch(_) { 
+      alert('Fehler'); 
+    }
     throw 'err';
   }
-  return res.json();
+    return res.json();
 }
 
+// Eventlistener für "Code anfordern"
 document.getElementById('btnRequest').addEventListener('click', async () => {
   const id = document.getElementById('identifier').value.trim();
-  if (!id) { alert('Bitte E-Mail oder Telefonnummer eingeben'); return; }
+  if (!id) { 
+    alert('Bitte E-Mail oder Telefonnummer eingeben'); 
+    return; 
+  }
+  
   try {
-    await api('/api/request-code', { method: 'POST', body: { identifier: id }});
+    // Anfrage an den Server: Registrierungscode anfordern
+    await api('/api/request-code', { 
+      method: 'POST', 
+      body: { identifier: id }
+    });
+    // Weiterleitung auf Seite zur Code-Verifizierung
     location.href = '/verify-set.html?identifier=' + encodeURIComponent(id) + '&purpose=register';
   } catch(e) {}
 });
 
-document.getElementById('btnBack').addEventListener('click', ()=> location.href='/');
+// Eventlistener für "Zurück zum Login"
+document.getElementById('btnBack').addEventListener('click', ()=> location.href = '/');
 </script>
 </body>
 </html>
